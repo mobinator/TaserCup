@@ -1,5 +1,13 @@
 <script>
   import { onMount } from 'svelte';
+  import io from 'socket.io-client';
+
+  /**
+     * @type {import("socket.io-client").Socket<import("@socket.io/component-emitter").DefaultEventsMap, import("@socket.io/component-emitter").DefaultEventsMap>}
+     */
+  let socket;
+  let connectionStatus = 'Nicht verbunden';
+
 
   let name = "Tasse 1";
   let countdown = 3;
@@ -14,19 +22,70 @@
   ];
 
   onMount(async () => {
-    setInterval(async () => {
-      for (let cup of cups) {
-        const response = await fetch(`http://localhost:5000/get_cup_state?cup_id=${cup.id}`);
-        const color = await response.text();
-        cup.color = color;
-      }
-    }, 100);
+    connect();
   });
 
+  function connect() {
+    socket = io('http://localhost:5000');
+
+    socket.on('connect', () => {
+      connectionStatus = 'Verbunden';
+      console.log("Verbindung hergestellt");
+    });
+
+    socket.on('message', (data) => {
+      console.log(`Daten empfangen: ${data}`);
+    });
+
+    socket.on('response', (data) =>{
+      console.log(`Response empfangen: ${data.data}`);
+    })
+
+    socket.on('cup_state', (data) => {
+      console.log(`Cup Daten empfangen: ${data.data}`);
+      let new_cups = data.data
+      let i = 0
+      new_cups.forEach(new_cup => {
+        cups[i].color = new_cup.color;
+        console.log(new_cup);
+        i+=1;
+      });
+      
+    });
+
+    socket.on('disconnect', () => {
+      connectionStatus = 'Getrennt';
+      console.log('Verbindung getrennt');
+    });
+
+    socket.on('connect_error', (err) => {
+      connectionStatus = `Verbindungsfehler: ${err.message}`;
+      console.log(`Verbindungsfehler: ${err.message}`);
+    });
+  }
+
+  /**
+     * @param {string} message_type
+     * @param {string} message
+     */
+  function sendMessage(message_type, message) {
+    if (socket.connected) {
+      socket.emit(message_type, message);
+    } else {
+      console.log("Socket ist nicht verbunden.");
+    }
+  }
+
+  function disconnect() {
+    if (socket) {
+      socket.disconnect();
+    }
+  }
+
   async function startGame() {
-    //const response = await fetch('http://localhost:5000/start_game');
-    //const data = await response.json();
-    //console.log(data);
+    
+    sendMessage('game_start', '3')
+
     showButton = false;
     const countdownInterval = setInterval(() => {
       countdown -= 1;
@@ -47,9 +106,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start; /* Align content to the top */
     width: 100%;
     height: 100vh;
+    overflow: auto; /* Allow scrolling */
     background-color: #ffad3b;
   }
 
@@ -65,9 +125,17 @@
   .card-container {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap; /* Allow the items to wrap as necessary */
     justify-content: center;
     margin-top: 5em;
     gap: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .card {
+      width: 90%; /* Make the card take up most of the screen width */
+      margin-bottom: 20px; /* Add some vertical spacing between the cards */
+    }
   }
 
   .card.white {
@@ -127,7 +195,7 @@
     img {
     width: 20rem; /* adjust as needed */
     height: auto;
-    margin-top: 0rem;
+    margin-top: 8rem;
     margin-bottom: 2rem;
   }
 
