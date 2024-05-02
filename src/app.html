@@ -1,0 +1,31 @@
+<!doctype html>
+
+<style>
+
+	@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap');
+	/* Remove default margin and padding */
+	body, html {
+		margin: 0;
+		padding: 0;
+		overflow: hidden; /* Hide scrollbar */
+		height: 100%; /* Full height */
+	}
+	
+	body {
+		background-color: #ffad3b;
+		font-family: 'Poppins', sans-serif !important;
+    	font-weight: 900 !important;
+	}
+</style>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>
