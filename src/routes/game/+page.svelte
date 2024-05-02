@@ -5,6 +5,7 @@
   let countdown = 3;
   let showButton = true;
   let showDrink = false;
+  let showDropdown = false;
   let cups = [
     { id: 1, color: 'white' },
     { id: 2, color: 'white' },
@@ -34,6 +35,10 @@
         showDrink = true;
       }
     }, 1000);
+  }
+
+  function toggleDropdown() {
+    showDropdown = !showDropdown;
   }
 </script>
 
@@ -77,12 +82,6 @@
     background-color: rgba(255, 57, 57, 0.5);
   }
 
-  h1 {
-    margin-top: 1em;
-    font-size: 50pt;
-    color: white;
-  }
-
   h2 {
     margin-top: 0em;
     margin-bottom: 0em;
@@ -105,11 +104,25 @@
       transition: background-color 0.3s;
       font-family: 'Poppins', sans-serif; /* Add this line */
       font-weight: 900; /* Add this line */
+      transition: background-color 0.3s ease;
     }
 
     button:hover {
       background-color: #f0f0f0;
     }
+
+    .hamburger-button {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    width: 50px;
+    height: 50px;
+    border: 2px solid white;
+    border-radius: 50%;
+    background-color: transparent;
+    padding: 10px;
+    cursor: pointer;
+  }
 
     img {
     width: 20rem; /* adjust as needed */
@@ -118,9 +131,51 @@
     margin-bottom: 2rem;
   }
 
+  .dropdown {
+    position: absolute;
+    left: 20px;
+    top: 80px;
+    display: flex;
+    flex-direction: column;
+    background-color: transparent;
+    border: 2px solid white;
+    border-radius: 15px;
+    padding: 10px;
+    gap: 0px;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.5s linear;
+  }
+
+  .dropdown.visible {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .dropdown button {
+    background-color: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+
+  .dropdown button:hover, .dropdown button:focus {
+    color: #6f40ac;
+  }
+
 </style>
 
 <main>
+  <button class="hamburger-button" on:click={toggleDropdown}>
+  </button>
+
+  <div class="dropdown {showDropdown ? 'visible' : ''}">
+    <button>Standard</button>
+    <button>In Arbeit</button>
+    <button>In Arbeit</button>
+  </div>
+
   <img src="/game.svg" alt="Game Logo">
   {#if showButton}
     <button on:click={startGame}>Starte Spiel</button>
