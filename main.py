@@ -1,14 +1,21 @@
 from flask import Flask, request, jsonify
 import requests
+import Cup
 
 app = Flask(__name__)
 
+cups = []
+
+@app.route('/', methods=['GET'])
+def base():
+    return "Hello World!"
+
+
 @app.route('/register_device', methods=['GET'])
 def register_device():
-    device_id = request.args.get('device_id', None)
-    if device_id is None:
-        return jsonify({'error': 'device_id is missing'}), 400
-
+    Cup.add_cup(request.remote_addr, cups)
+    print(cups)
+    return jsonify({'message': 'Device registered'}), 200
 
 @app.route('/greet', methods=['GET'])
 def greet():
