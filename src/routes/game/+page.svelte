@@ -45,7 +45,7 @@
       console.log(`Cup Daten empfangen: ${data.data}`);
       let new_cups = data.data
       let i = 0
-      new_cups.forEach(new_cup => {
+      new_cups.forEach((/** @type {{ color: string; }} */ new_cup) => {
         cups[i].color = new_cup.color;
         console.log(new_cup);
         i+=1;
