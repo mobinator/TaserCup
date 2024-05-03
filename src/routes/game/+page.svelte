@@ -14,12 +14,10 @@
   let showButton = true;
   let showDrink = false;
   let showDropdown = false;
-  let cups = [
-    { id: 1, color: 'white' },
-    { id: 2, color: 'white' },
-    { id: 3, color: 'white' },
-    { id: 4, color: 'white' },
-  ];
+  /**
+     * @type {any[]}
+     */
+  let cups = [];
 
   onMount(async () => {
     connect();
@@ -45,6 +43,8 @@
     //TODO: Neue Tasse empfangen
     socket.on('new_cup', (data) => {
       console.log(`Neue Tasse empfangen: ${data.data}`);
+      console.log(data.data);
+      cups.push(data.data);
     });
 
     socket.on('cup_state', (data) => {
