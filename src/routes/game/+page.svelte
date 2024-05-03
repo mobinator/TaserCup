@@ -47,15 +47,21 @@
       cups = [...cups, data.data];
     });
 
+    socket.on('all_cups', (data) => {
+      console.log(`Neue Tassen empfangen: ${data.data}`);
+      console.log(data.data);
+      cups = data.data;
+    });
+
     socket.on('cup_state', (data) => {
       console.log(`Cup Daten empfangen: ${data.data}`);
-      let new_cups = data.data
-      let i = 0
-      new_cups.forEach((/** @type {{ color: string; }} */ new_cup) => {
-        cups[i].color = new_cup.color;
-        console.log(new_cup);
-        i+=1;
-      });
+      console.log(data.data);
+      let new_cup_data = data.data
+      cups.forEach(cup => {
+        if(cup.id = new_cup_data.id){
+          cup.color = new_cup_data.color
+        }
+      })
       
     });
 
@@ -262,7 +268,7 @@
   <div class="card-container">
     {#each cups as cup (cup.id)}
       <div class="card {cup.color}">
-        <h3 contenteditable="true">Tasse {cup.id}</h3>
+        <h3 contenteditable="true">{cup.name}</h3>
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sit amet semper lorem. Sed feugiat, massa a finibus aliquet, nisl nunc cursus lorem, vitae aliquam massa ante non ex.</p>
       </div>
     {/each}
