@@ -57,12 +57,12 @@
       console.log(`Cup Daten empfangen: ${data.data}`);
       console.log(data.data);
       let new_cup_data = data.data
-      cups.forEach(cup => {
-        if(cup.id = new_cup_data.id){
-          cup.color = new_cup_data.color
+      cups = cups.map(cup => {
+        if(cup.id === new_cup_data.id){
+          return {...cup, color: new_cup_data.color}
         }
+        return cup;
       })
-      
     });
 
     socket.on('disconnect', () => {
