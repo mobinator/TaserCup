@@ -33,13 +33,19 @@
       console.log("Verbindung hergestellt");
     });
 
-    socket.on('message', (data) => {
-      console.log(`Daten empfangen: ${data}`);
-    });
-
     socket.on('response', (data) =>{
       console.log(`Response empfangen: ${data.data}`);
-    })
+    });
+
+    //TODO: Reset empfangen
+    socket.on('reset', (data) => {
+      console.log(`Reset empfangen: ${data.data}`);
+    });
+
+    //TODO: Neue Tasse empfangen
+    socket.on('new_cup', (data) => {
+      console.log(`Neue Tasse empfangen: ${data.data}`);
+    });
 
     socket.on('cup_state', (data) => {
       console.log(`Cup Daten empfangen: ${data.data}`);
