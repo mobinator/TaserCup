@@ -11,11 +11,6 @@ game_states = ['waiting', 'countdown', 'running']
 
 cups = {}
 
-def start_game2():
-    time.sleep(5)
-    emit('cup_state', {'data' : [{'id': 1, 'color': 'red'}, {'id': 2, 'color': 'green'}, {'id': 3, 'color': 'white'}]})
-    print("Game started")
-
 @app.route('/')
 def index():
     return "WebSocket Server von TaserCup"
@@ -24,14 +19,16 @@ def index():
 def register_cup():
     #get ip addr of cup
     #store ip addr in cups dict
-    cop_ip = request.remote_addr
-    cups[cop_ip] = {'id': request.remote_addr, 'color': 'white'}
+    cup_ip = request.remote_addr
+    cups[cup_ip] = {'id': cup_ip, 'color': 'white'}
     print(cups)
+    new_cup(cups[cup_ip])
     return "Register Cup"
 
 @socketio.on('connect')
 def test_connect():
     emit('after connect', {'data': 'Connected'})
+
 
 @socketio.on('message')
 def handle_message(data):
@@ -44,11 +41,17 @@ def handle_message(data):
 def start_game(data):
     print('received game_start: ' + data)
     emit('response', {'data': 'Game started'})
-    start_game2()
+
 
 def reset_game():
     print('Game reset')
     emit('reset', {'data': 'Game reset'})
 
+def new_cup(data):
+    print('New cup: ', data)
+    socketio.emit('new_cup', {'data': data})
+
+
 if __name__ == '__main__':
     socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
+
