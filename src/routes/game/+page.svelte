@@ -42,7 +42,7 @@
       showDrink = false;
       countdown = 3;
     });
-    
+
     //TODO: Neue Tasse empfangen
     socket.on('new_cup', (data) => {
       console.log(`Neue Tasse empfangen: ${data.data}`);
@@ -194,6 +194,11 @@
       background-color: #f0f0f0;
     }
 
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
     .hamburger-button {
     position: absolute;
     left: 20px;
@@ -247,6 +252,10 @@
     color: #6f40ac;
   }
 
+  .no-cups-message {
+    color: rgb(145, 0, 0);
+  }
+
 </style>
 
 <main>
@@ -261,7 +270,7 @@
 
   <img src="/game.svg" alt="Game Logo">
   {#if showButton}
-    <button on:click={startGame}>Starte Spiel</button>
+    <button on:click={startGame} disabled={cups.length === 0}>Starte Spiel</button>
   {:else if !showDrink}
     <h2>{countdown}</h2>
   {:else}
@@ -269,11 +278,15 @@
   {/if}
 
   <div class="card-container">
-    {#each cups as cup (cup.id)}
-      <div class="card {cup.color}">
-        <h3 contenteditable="true">{cup.name}</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sit amet semper lorem. Sed feugiat, massa a finibus aliquet, nisl nunc cursus lorem, vitae aliquam massa ante non ex.</p>
-      </div>
-    {/each}
+    {#if cups.length === 0}
+      <p class="no-cups-message">Keine Becher verbunden</p>
+    {:else}
+      {#each cups as cup (cup.id)}
+        <div class="card {cup.color}">
+          <h3 contenteditable="true">{cup.name}</h3>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sit amet semper lorem. Sed feugiat, massa a finibus aliquet, nisl nunc cursus lorem, vitae aliquam massa ante non ex.</p>
+        </div>
+      {/each}
+    {/if}
   </div>
 </main>
