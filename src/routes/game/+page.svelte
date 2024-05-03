@@ -38,8 +38,11 @@
     //TODO: Reset empfangen
     socket.on('reset', (data) => {
       console.log(`Reset empfangen: ${data.data}`);
+      showButton = true;
+      showDrink = false;
+      countdown = 3;
     });
-
+    
     //TODO: Neue Tasse empfangen
     socket.on('new_cup', (data) => {
       console.log(`Neue Tasse empfangen: ${data.data}`);
