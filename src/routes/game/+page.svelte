@@ -44,7 +44,7 @@
     socket.on('new_cup', (data) => {
       console.log(`Neue Tasse empfangen: ${data.data}`);
       console.log(data.data);
-      cups.push(data.data);
+      cups = [...cups, data.data];
     });
 
     socket.on('cup_state', (data) => {
