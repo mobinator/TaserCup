@@ -1,11 +1,11 @@
 
 
-def add_cup(ip: str, cups: list):
+def add_cup(ip: str, cups: dict):
     cup_ips = [cup.ip for cup in cups]
     cup_id = len(cups) + 1
     if ip not in cup_ips:
         cup = Cup(cup_id, ip)
-        cups.append(cup)
+        cups[cup_id] = cup
         return cup
 
 
