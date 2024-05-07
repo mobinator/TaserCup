@@ -42,7 +42,6 @@
       console.log(`Response empfangen: ${data.data}`);
     });
 
-    //TODO: Reset empfangen
     socket.on('reset', (data) => {
       console.log(`Reset empfangen: ${data.data}`);
       showButton = true;
@@ -50,7 +49,6 @@
       countdown = 3;
     });
 
-    //TODO: Neue Tasse empfangen
     socket.on('new_cup', (data) => {
       console.log(`Neue Tasse empfangen: ${data.data}`);
       console.log(data.data);
@@ -128,10 +126,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; /* Align content to the top */
+    justify-content: flex-start;
     width: 100%;
     height: 100vh;
-    overflow: auto; /* Allow scrolling */
+    overflow: auto;
     background-color: #ffad3b;
   }
 
@@ -147,7 +145,7 @@
   .card-container {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap; /* Allow the items to wrap as necessary */
+    flex-wrap: wrap;
     justify-content: center;
     margin-top: 5em;
     gap: 20px;
@@ -155,8 +153,8 @@
 
   @media (max-width: 768px) {
     .card {
-      width: 90%; /* Make the card take up most of the screen width */
-      margin-bottom: 20px; /* Add some vertical spacing between the cards */
+      width: 90%;
+      margin-bottom: 20px;
     }
   }
 
@@ -208,8 +206,8 @@
       font-size: 1.5rem;
       cursor: pointer;
       transition: background-color 0.3s;
-      font-family: 'Poppins', sans-serif; /* Add this line */
-      font-weight: 900; /* Add this line */
+      font-family: 'Poppins', sans-serif;
+      font-weight: 900;
       transition: background-color 0.3s ease;
     }
 
@@ -236,10 +234,17 @@
   }
 
     img {
-    width: 20rem; /* adjust as needed */
+    width: 20rem;
     height: auto;
     margin-top: 8rem;
     margin-bottom: 2rem;
+  }
+
+  .card img {
+    width: 50%;
+    height: auto;
+    display: block;
+    margin: auto;
   }
 
   .dropdown {
@@ -307,7 +312,8 @@
       {#each cups as cup (cup.id)}
         <div class="card {cup.color}">
           <h3 contenteditable="true">{cup.name}</h3>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sit amet semper lorem. Sed feugiat, massa a finibus aliquet, nisl nunc cursus lorem, vitae aliquam massa ante non ex.</p>
+          <p>{cup.id}</p>
+          <img src="/cup.svg" alt="Cup Icon">
         </div>
       {/each}
     {/if}
