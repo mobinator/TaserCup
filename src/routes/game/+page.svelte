@@ -5,8 +5,11 @@
   /**
      * @type {import("socket.io-client").Socket<import("@socket.io/component-emitter").DefaultEventsMap, import("@socket.io/component-emitter").DefaultEventsMap>}
      */
-  let socket;
+     let socket;
   let connectionStatus = 'Nicht verbunden';
+  const possibleIPAddresses = ['localhost', '10.3.141.1', '192.168.2.155']; // Liste der möglichen IP-Adressen des Raspberry Pi
+  let connected = false
+
 
 
   let name = "Tasse 1";
@@ -20,14 +23,18 @@
   let cups = [];
 
   onMount(async () => {
-    connect();
+    connect("192.168.2.155");
   });
 
-  function connect() {
-    socket = io('http://localhost:5000');
+  /**
+     * @param {string} [ipAddress]
+     */
+  function connect(ipAddress) {
+    socket = io(`http://${ipAddress}:5000`);
 
     socket.on('connect', () => {
       connectionStatus = 'Verbunden';
+      connected = true;
       console.log("Verbindung hergestellt");
     });
 
