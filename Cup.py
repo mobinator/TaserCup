@@ -61,9 +61,13 @@ class Cup:
                 print(f'Cup {self.id} put down')
 
         elif self.state == cup_states[3]:
-            if 5.1 > z_acceleration > 4.9 and 5.1 > self.last_z_acceleration > 4.9:
+            if 5.1 > z_acceleration > 4.9 and 5.1 > self.last_z_acceleration > 4.9 and brightness < self.standing_brightness + 40:
                 self.state = cup_states[0]
                 print(f'Cup {self.id} is standing again')
+
+            if z_acceleration < 1 and self.last_z_acceleration < 1:
+                self.state = cup_states[2]
+                print(f'Cup {self.id} drinking')
 
 
     def activate_taser(self):
