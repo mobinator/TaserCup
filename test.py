@@ -1,76 +1,66 @@
-import asyncio
 import serial
-import websockets
+import threading
+import queue
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)  # Allow CORS for all routes
+
+# Thread-safe Queue for communication between threads
+data_queue = queue.Queue()
 
 
-# Serial communication coroutine
-async def read_serial(port, baudrate, queue):
+# Serial communication function
+def read_serial(port, baudrate):
     try:
         ser = serial.Serial(port, baudrate, timeout=0)
         print(f"Listening on {port} at {baudrate} baud rate.")
 
         while True:
-            data = ser.read(ser.in_waiting or 1)
-            if data:
-                line = data.decode('utf-8', errors='ignore').rstrip()
-                if line:
-                    print(f"Received from serial: {line}")
-                    await queue.put(line)
-            await asyncio.sleep(0.01)  # Yield control to the event loop
+            line = ser.readline().decode('utf-8', errors='ignore').rstrip()
+            if line:
+                print(f"Received from serial: {line}")
+                data_queue.put(line)
 
     except serial.SerialException as e:
         print(f"Serial exception: {e}")
-    except asyncio.CancelledError:
-        pass
+    except KeyboardInterrupt:
+        print("Exiting serial thread.")
     finally:
         if ser.is_open:
             ser.close()
             print("Serial port closed.")
 
 
-# Websocket communication coroutine
-async def websocket_handler(websocket, path, queue):
-    print(f"Websocket connection from {websocket.remote_address}")
-    try:
-        while True:
-            # Check if there is data from the serial coroutine
-            if not queue.empty():
-                line = await queue.get()
-                await websocket.send(line)
-
-            # Check if there is data from the websocket
-            try:
-                data = await asyncio.wait_for(websocket.recv(), timeout=0.1)
-                print(f"Received from socket: {data}")
-                # Here you can add code to send data back to the serial if needed
-            except asyncio.TimeoutError:
-                pass  # No data received within the timeout period
-    except asyncio.CancelledError:
-        print("Websocket handler cancelled.")
-    finally:
-        print("Websocket connection closed.")
+# Route to get data from the serial thread
+@app.route('/get_data', methods=['GET'])
+def get_data():
+    data_list = []
+    while not data_queue.empty():
+        data_list.append(data_queue.get())
+    return jsonify(data_list)
 
 
-# Main function
-async def main():
+# Route to send data to the serial port
+@app.route('/send_data', methods=['POST'])
+def send_data():
+    data = request.json.get('data')
+    if data:
+        # Here you would send the data to the serial port if needed
+        print(f"Data to send to serial: {data}")
+        return jsonify({"status": "success", "data": data})
+    return jsonify({"status": "error", "message": "No data provided"}), 400
+
+
+def start_serial_thread():
     port = "COM9"
     baudrate = 115200
-    host = '0.0.0.0'
-    ws_port = 8080
-
-    # Queue for communication between coroutines
-    queue = asyncio.Queue()
-
-    # Start the serial reader coroutine
-    serial_task = asyncio.create_task(read_serial(port, baudrate, queue))
-
-    # Start the websocket server
-    async with websockets.serve(lambda ws, path: websocket_handler(ws, path, queue), host, ws_port):
-        print(f"Websocket server listening on {host}:{ws_port}")
-        await asyncio.Future()  # Run forever
+    serial_thread = threading.Thread(target=read_serial, args=(port, baudrate))
+    serial_thread.daemon = True
+    serial_thread.start()
 
 
-try:
-    asyncio.run(main())
-except KeyboardInterrupt:
-    print("Exiting main program.")
+if __name__ == "__main__":
+    start_serial_thread()
+    app.run(host='0.0.0.0', port=5000)
