@@ -23,7 +23,7 @@
   let cups = [];
 
   onMount(async () => {
-    connect("192.168.2.155");
+    connect("localhost");
   });
 
   /**
@@ -73,6 +73,11 @@
       })
     });
 
+    socket.on('game_started', () => {
+      console.log('Game start Callback');
+      startGame()
+    });
+
     socket.on('disconnect', () => {
       connectionStatus = 'Getrennt';
       console.log('Verbindung getrennt');
@@ -104,9 +109,9 @@
 
   async function startGame() {
     
-    sendMessage('game_start', '3')
+    showDrink = false;
+    countdown = 3;
 
-    showButton = false;
     const countdownInterval = setInterval(() => {
       countdown -= 1;
       if (countdown === 0) {
@@ -114,6 +119,14 @@
         showDrink = true;
       }
     }, 1000);
+  }
+
+  async function initGame(){
+
+    sendMessage('game_start', '3')
+    showButton = false;
+    showDrink = false;
+
   }
 
   function toggleDropdown() {
@@ -298,7 +311,7 @@
 
   <img src="/game.svg" alt="Game Logo">
   {#if showButton}
-    <button on:click={startGame} disabled={cups.length === 0}>Starte Spiel</button>
+    <button on:click={initGame} disabled={cups.length === 0}>Starte Spiel</button>
   {:else if !showDrink}
     <h2>{countdown}</h2>
   {:else}
