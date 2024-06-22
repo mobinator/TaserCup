@@ -18,11 +18,17 @@ class Cup:
         self.safe = True
 
         self.standing_brightness = brightness
+        self.drinking_brightness = 3000
         self.last_z_acceleration = 0
+        self.standing_again = False
 
     def update(self, brightness: int, z_acceleration: float, game_state: str):
         self.update_cup_state(brightness, z_acceleration)
         self.last_z_acceleration = z_acceleration
+
+        if self.state == cup_states[3]:
+            pass
+            # print(f"CUP {self.id}: Brightness: {brightness} | Accel: {z_acceleration}")
 
         if game_state == "countdown" and self.state == cup_states[1] and not self.safe:
             print("Cup picked up to early!")
@@ -42,6 +48,8 @@ class Cup:
 
     def update_cup_state(self, brightness: int, z_acceleration: float):
 
+        # print(f"Brightness: {brightness} | Accel: {z_acceleration}")
+
         if self.state == cup_states[0]:
             if brightness > self.standing_brightness + 40 and z_acceleration > 5.5 and self.last_z_acceleration > 5.5:
                 self.state = cup_states[1]
@@ -51,16 +59,21 @@ class Cup:
             if z_acceleration < 1 and self.last_z_acceleration < 1:
                 self.state = cup_states[2]
                 print(f'Cup {self.id} drinking')
+            if 5.1 > z_acceleration > 4.3 and 5.1 > self.last_z_acceleration > 4.3 and brightness < (self.drinking_brightness * 0.75):
+                self.state = cup_states[0]
+                print(f'Cup {self.id} is standing again with drinking_brightness = {self.drinking_brightness} adjusted val: {self.drinking_brightness * 0.75}')
 
         elif self.state == cup_states[2]:
             if z_acceleration > 5.5:
                 self.state = cup_states[3]
                 print(f'Cup {self.id} put down')
+                self.drinking_brightness = brightness
 
         elif self.state == cup_states[3]:
-            if 5.1 > z_acceleration > 4.9 and 5.1 > self.last_z_acceleration > 4.9 and brightness < self.standing_brightness + 40:
+            if 5.1 > z_acceleration > 4.3 and 5.1 > self.last_z_acceleration > 4.3 and brightness < (self.drinking_brightness * 0.75):
                 self.state = cup_states[0]
-                print(f'Cup {self.id} is standing again')
+                print(f'Cup {self.id} is standing again with drinking_brightness = {self.drinking_brightness} adjusted val: {self.drinking_brightness * 0.75}')
+                self.standing_again = True
 
             if z_acceleration < 1 and self.last_z_acceleration < 1:
                 self.state = cup_states[2]
@@ -69,7 +82,8 @@ class Cup:
     def activate_taser(self):
         if not self.safe:
             print('Taser activated')
-            self.serial.on_send(f'TASE {self.id} 100 \r\n')
+            self.serial.write(f'TASE {self.id} 100 \r\n'.encode('utf-8'))
+            # self.serial.on_send(f'TASE {self.id} 100 \r\n')
             self.update_color('red')
         else:
             print(f'Taser not activated Cup: {self.id} is safe')
